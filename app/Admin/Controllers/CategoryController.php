@@ -17,24 +17,38 @@ class CategoryController extends BaseController
 {
     //use ModelForm;
     //菜单下来选择
-    protected function cate_drop_select($is_arr = true)
+    protected function cate_drop_select($is_select = true)
     {
-        $cates = Category::getNestedList('name', 'cate_id', '　　');
+        $cates = Category::all();
+        $cates->transform(function ($cate, $key) {
+            if ($cate->parent_id == null) {
+                $cate->setAttribute('parent_id', 0);
+            } else {
+                $cate->setAttribute('name', str_repeat('　　', $cate->depth) . ' |——' . $cate->name);
+            }
 
-        $keys = array_keys($cates);
-
-        array_unshift($keys, 0);
-        $values = array_values($cates);
-        array_unshift($values, '----请选择----');
-        $cates = array_combine($keys, $values);
-        array_walk($cates, function (&$v, $k) {
-            $v = str_replace_last('　', ' |——', $v);
+            return $cate;
         });
-        return $cates;
+        $rst = Category::unlimited_cates($cates);
+
+        if ($is_select) {
+            return $rst->pluck('name', 'cate_id')->toArray();
+        } else {
+            return $rst;
+        }
+    }
+
+    protected function rebuildTree()
+    {
+        $is_valid = Category::isValidNestedSet();
+        if (!$is_valid) {
+            Category::rebuild();
+        }
     }
 
     protected function grid()
     {
+        //$this->rebuildTree();
         return Admin::grid(Category::class, function (Grid $grid) {
             $grid->model()->collection(function () {
                 $cates = Category::all();
@@ -55,6 +69,7 @@ class CategoryController extends BaseController
                 foreach ($cates_nest as $cate_id => $name) {
                     $data->push($cates->find($cate_id)->setAttribute('name', $name));
                 }
+                dd($data);
                 return $data;
             });
 
@@ -65,22 +80,22 @@ class CategoryController extends BaseController
             $grid->description('描述')->limit(20);
             $grid->keywords('关键字');
             $grid->is_nav('导航?')->value(function ($is_nav) {
-                    return $is_nav ?
-                        "<i class='fa fa-check' style='color:green'></i>" :
-                        "<i class='fa fa-close' style='color:red'></i>";
-                });
+                return $is_nav ?
+                    "<i class='fa fa-check' style='color:green'></i>" :
+                    "<i class='fa fa-close' style='color:red'></i>";
+            });
             $grid->is_show('显示?')->value(function ($is_show) {
-                    return $is_show ?
-                        "<i class='fa fa-check' style='color:green'></i>" :
-                        "<i class='fa fa-close' style='color:red'></i>";
-                });
+                return $is_show ?
+                    "<i class='fa fa-check' style='color:green'></i>" :
+                    "<i class='fa fa-close' style='color:red'></i>";
+            });
             $grid->url('url')->limit(20);;
             //$grid->updated_at('更新时间');
             $grid->state('状态')->value(function ($state) {
-                    return $state ?
-                        "<i class='fa fa-check' style='color:green'></i>" :
-                        "<i class='fa fa-close' style='color:red'></i>";
-                });
+                return $state ?
+                    "<i class='fa fa-check' style='color:green'></i>" :
+                    "<i class='fa fa-close' style='color:red'></i>";
+            });
 
             $grid->filter(function ($filter) {
                 $filter->disableIdFilter();
@@ -93,12 +108,13 @@ class CategoryController extends BaseController
 
     protected function form()
     {
+        $this->rebuildTree();
         $cates = $this->cate_drop_select();
-        return Admin::form(Category::class, function (Form $form) use ($cates)  {
+        return Admin::form(Category::class, function (Form $form) use ($cates) {
             $form->display('cate_id', 'ID');
             $form->text('name', '分类名');
             $form->select('parent_id', '父分类')->options($cates);
-            $form->radio('state','状态')->default(1)->options([0 => '关闭', 1 => '开启']);
+            $form->radio('state', '状态')->default(1)->options([0 => '关闭', 1 => '开启']);
             $form->radio('is_show', '是否显示')->default(1)->options([0 => '不显示', 1 => '显示']);
             $form->radio('is_nav', '是否是导航项')->default(1)->options([0 => '否', 1 => '是']);
             $form->textarea('price_range', '价格区间')->help('每行代表一个价格区');
@@ -181,8 +197,11 @@ class CategoryController extends BaseController
                 "is_nav" => "1",
                 "url" => "http://hayes.com/dicta-ex-quisquam-sunt-porro-sit-voluptas.html",
                 "order" => "9"]
-        ];*/
-        //Category::buildTree($cates);
+        ];
+        Category::buildTree($cates);
+        */
+        //dd(Category::isValidNestedSet());
+        //dd($this->cate_drop_select(1));
 
         return $this->_render($this->grid());
     }
@@ -214,9 +233,9 @@ class CategoryController extends BaseController
         if ($parent_id != $current_node->parent_id) {
             $change_parent = true;
         }
-        $state = $current_node->update($data);
+        $rst = $current_node->update($data);
 
-        if(!$state){
+        if (!$rst) {
             $fail = new MessageBag([
                 'title' => trans('admin::lang.failed'),
                 'message' => trans('admin::lang.update_failed'),
@@ -224,6 +243,7 @@ class CategoryController extends BaseController
 
             return redirect('admin/category')->with(compact('fail'));
         }
+//dd($change_parent);
 
         if ($change_parent) {
             if ($parent_id == 0) {
@@ -243,7 +263,18 @@ class CategoryController extends BaseController
 
     public function destroy($id)
     {
-        if ($this->form()->destroy($id)) {
+        //软删除：如果状态为开启，则设置为关闭
+        //硬删除：如果状态为关闭，则直接删除，并且删除下边的孩子节点
+        $node_to_delete = Category::find($id);
+        if ($node_to_delete->state == 0) {
+            //说明要执行 硬删除(包括子节点)
+            $rst = $node_to_delete->delete();
+        } else {
+            //说明要执行软删除
+            $node_to_delete->state = 0;
+            $rst = $node_to_delete->save();
+        }
+        if ($rst) {
             return response()->json([
                 'status' => true,
                 'message' => trans('admin::lang.delete_succeeded'),
