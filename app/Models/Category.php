@@ -38,6 +38,7 @@ class Category extends Node
     //
     protected $table = 'categories';
     protected $primaryKey = 'cate_id';
+    protected $orderColumn = 'order';
 
     //获取select下拉分类
     /*

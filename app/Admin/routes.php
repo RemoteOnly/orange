@@ -12,7 +12,9 @@ Route::group([
     //商品管理
     $router->resource('product', 'ProductController');
     //分类管理
+    $router->get('category/delete/{cate_id}','BrandController@delete')->name('category.delete');
     $router->resource('category', 'CategoryController');
     //品牌管理
+
     $router->resource('brand', 'BrandController');
 });
