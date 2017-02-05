@@ -27,26 +27,24 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  * @property \Carbon\Carbon $updated_at
  * @property string $deleted_at
  * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $notifications
- * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $readNotifications
- * @property-read \Illuminate\Notifications\DatabaseNotificationCollection|\Illuminate\Notifications\DatabaseNotification[] $unreadNotifications
- * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereId($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereUsername($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereCreatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereDeletedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereEmail($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\User wherePassword($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereMobile($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereVerifyEmail($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereVerifyMobile($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereLiftBanTime($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereLevelId($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereLastVisitTime($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereId($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereLastVisitIp($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereLastVisitTime($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereLevelId($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereLiftBanTime($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereMobile($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\User wherePassword($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereRegisterIp($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereRegisterRgId($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereSex($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereRememberToken($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereCreatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereSex($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereDeletedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereUsername($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereVerifyEmail($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereVerifyMobile($value)
  * @mixin \Eloquent
  */
 class User extends Authenticatable

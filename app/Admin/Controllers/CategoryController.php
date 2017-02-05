@@ -20,7 +20,9 @@ class CategoryController extends BaseController
     protected function cate_drop_select($is_arr = true)
     {
         $cates = Category::getNestedList('name', 'cate_id', '　　');
+
         $keys = array_keys($cates);
+
         array_unshift($keys, 0);
         $values = array_values($cates);
         array_unshift($values, '----请选择----');
@@ -34,11 +36,11 @@ class CategoryController extends BaseController
     protected function grid()
     {
         return Admin::grid(Category::class, function (Grid $grid) {
-            $grid->model()->collection(function (){
+            $grid->model()->collection(function () {
                 $cates = Category::all();
                 //ajax查询处理
-                if(isset($_REQUEST['name'])){
-                    $cate_after_filtered = $cates->filter(function($item){
+                if (isset($_REQUEST['name'])) {
+                    $cate_after_filtered = $cates->filter(function ($item) {
                         return str_contains(strtolower($item->name), strtolower($_REQUEST['name']));
                     });
                     return $cate_after_filtered;
@@ -63,37 +65,42 @@ class CategoryController extends BaseController
             $grid->description('描述')->limit(20);
             $grid->keywords('关键字');
             $grid->is_nav('导航?')->value(function ($is_nav) {
-                return $is_nav ? "<i class='fa fa-check' style='color:green'></i>" :
-                    "<i class='fa fa-close' style='color:red'></i>";
-            });
+                    return $is_nav ?
+                        "<i class='fa fa-check' style='color:green'></i>" :
+                        "<i class='fa fa-close' style='color:red'></i>";
+                });
             $grid->is_show('显示?')->value(function ($is_show) {
-                return $is_show ? "<i class='fa fa-check' style='color:green'></i>" :
-                    "<i class='fa fa-close' style='color:red'></i>";
-            });
+                    return $is_show ?
+                        "<i class='fa fa-check' style='color:green'></i>" :
+                        "<i class='fa fa-close' style='color:red'></i>";
+                });
             $grid->url('url')->limit(20);;
             //$grid->updated_at('更新时间');
-            $grid->deleted_at('状态')->value(function ($deleted_at) {
-                return $deleted_at ? "<i class='fa fa-close' style='color:red'></i>" :
-                    "<i class='fa fa-check' style='color:green'></i>";
-            });
+            $grid->state('状态')->value(function ($state) {
+                    return $state ?
+                        "<i class='fa fa-check' style='color:green'></i>" :
+                        "<i class='fa fa-close' style='color:red'></i>";
+                });
 
             $grid->filter(function ($filter) {
                 $filter->disableIdFilter();
                 $filter->like('name', '分类名');
             });
             $grid->disableBatchDeletion();
+            $grid->disablePagination();
         });
     }
 
     protected function form()
     {
         $cates = $this->cate_drop_select();
-        return Admin::form(Category::class, function (Form $form) use ($cates) {
+        return Admin::form(Category::class, function (Form $form) use ($cates)  {
             $form->display('cate_id', 'ID');
             $form->text('name', '分类名');
             $form->select('parent_id', '父分类')->options($cates);
-            $form->radio('is_show', '是否显示')->options([0 => '不显示', 1 => '显示'])->default(1);
-            $form->radio('is_nav', '是否是导航项')->options([0 => '否', 1 => '是'])->default(1);
+            $form->radio('state','状态')->default(1)->options([0 => '关闭', 1 => '开启']);
+            $form->radio('is_show', '是否显示')->default(1)->options([0 => '不显示', 1 => '显示']);
+            $form->radio('is_nav', '是否是导航项')->default(1)->options([0 => '否', 1 => '是']);
             $form->textarea('price_range', '价格区间')->help('每行代表一个价格区');
             $form->url('url', '路径')->value('https://');
             $form->textarea('description', '描述');
@@ -201,14 +208,23 @@ class CategoryController extends BaseController
     {
         $data = $request->except(['parent_id']);
         $parent_id = $request->get('parent_id');
-        //dd($cate_id);
         $current_node = Category::find($cate_id);
         //判断是否父节点发生变化
         $change_parent = false;
         if ($parent_id != $current_node->parent_id) {
             $change_parent = true;
         }
-        $current_node->save($data);
+        $state = $current_node->update($data);
+
+        if(!$state){
+            $fail = new MessageBag([
+                'title' => trans('admin::lang.failed'),
+                'message' => trans('admin::lang.update_failed'),
+            ]);
+
+            return redirect('admin/category')->with(compact('fail'));
+        }
+
         if ($change_parent) {
             if ($parent_id == 0) {
                 $current_node->makeRoot();
@@ -216,6 +232,7 @@ class CategoryController extends BaseController
                 $current_node->makeChildOf(Category::find($parent_id));
             }
         }
+
         $success = new MessageBag([
             'title' => trans('admin::lang.succeeded'),
             'message' => trans('admin::lang.update_succeeded'),

@@ -34,6 +34,7 @@ class CreateCategoriesTable extends Migration
             $table->integer('is_show')->comment('是否显示');
             $table->integer('is_nav')->comment('显示在导航栏');
             $table->string('url')->comment('自定义链接');
+            $table->tinyInteger('state')->default(1)->comment('状态');
             $table->integer('order')->comment('排序');
             $table->timestamps();
         });

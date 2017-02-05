@@ -16,13 +16,13 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Carbon\Carbon $updated_at
  * @property string $deleted_at
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Brand whereBrandId($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\Brand whereName($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\Brand whereLogoPath($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\Brand whereDescription($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\Brand whereOrder($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Brand whereCreatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\Brand whereUpdatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Brand whereDeletedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Brand whereDescription($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Brand whereLogoPath($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Brand whereName($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Brand whereOrder($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Brand whereUpdatedAt($value)
  * @mixin \Eloquent
  */
 class Brand extends Model

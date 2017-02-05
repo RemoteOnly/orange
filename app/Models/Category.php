@@ -12,25 +12,21 @@ use PhpParser\Node\Expr\AssignOp\Mod;
  * App\Models\Category
  *
  * @property int $cate_id
- * @property string $name
- * @property string $price_range 价格范围 用,分割区间
- * @property int $parent_id 父id
- * @property bool $layer 级别
- * @property bool $has_child 是否有子节点
- * @property string $path 路径
+ * @property int $parent_id
+ * @property int $lft
+ * @property int $rgt
+ * @property int $depth
+ * @property string $name 分类名称
+ * @property string $price_range 价格区间,用换行分割
+ * @property string $description 分类描述
+ * @property string $keywords 分类关键字
+ * @property int $is_show 是否显示
+ * @property int $is_nav 显示在导航栏
+ * @property string $url 自定义链接
+ * @property bool $state 状态
+ * @property int $order 排序
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
- * @property string $deleted_at
- * @method static \Illuminate\Database\Query\Builder|\App\Models\Category whereCateId($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\Category whereName($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\Category wherePriceRange($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\Category whereParentId($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\Category whereLayer($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\Category whereHasChild($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\Category wherePath($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\Category whereCreatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\Category whereUpdatedAt($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\Category whereDeletedAt($value)
  * @mixin \Eloquent
  */
 class Category extends Node
@@ -39,6 +35,7 @@ class Category extends Node
     protected $table = 'categories';
     protected $primaryKey = 'cate_id';
     protected $orderColumn = 'order';
+   // protected $fillable =['name','$price_range','description','keywords','is_show','is_nav','state','order','url'];
 
     //获取select下拉分类
     /*
