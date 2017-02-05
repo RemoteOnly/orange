@@ -15,6 +15,7 @@ Route::group([
     $router->get('category/delete/{cate_id}','BrandController@delete')->name('category.delete');
     $router->resource('category', 'CategoryController');
     //品牌管理
-
     $router->resource('brand', 'BrandController');
+    //属性管理
+    $router->resource('attribute','AttributeController');
 });

@@ -38,45 +38,25 @@ class CategoryController extends BaseController
         }
     }
 
-    protected function rebuildTree()
-    {
-        $is_valid = Category::isValidNestedSet();
-        if (!$is_valid) {
-            Category::rebuild();
-        }
-    }
-
     protected function grid()
     {
-        //$this->rebuildTree();
         return Admin::grid(Category::class, function (Grid $grid) {
             $grid->model()->collection(function () {
-                $cates = Category::all();
+
                 //ajax查询处理
                 if (isset($_REQUEST['name'])) {
+                    $cates = Category::all();
                     $cate_after_filtered = $cates->filter(function ($item) {
                         return str_contains(strtolower($item->name), strtolower($_REQUEST['name']));
                     });
                     return $cate_after_filtered;
                 }
 
-                //获取已分好组的分类
-                $cates_nest = Category::getNestedList('name', 'cate_id', '　　');
-                array_walk($cates_nest, function (&$v, $k) {
-                    $v = str_replace_last('　', ' |——', $v);
-                });
-                $data = collect();
-                foreach ($cates_nest as $cate_id => $name) {
-                    $data->push($cates->find($cate_id)->setAttribute('name', $name));
-                }
-                dd($data);
-                return $data;
+                return $this->cate_drop_select(false);
             });
-
-            $grid->order('排序')->sortable();
+            $grid->order('order', '排序')->editable();
             $grid->name('分类名');
             $grid->price_range('价格区间');
-
             $grid->description('描述')->limit(20);
             $grid->keywords('关键字');
             $grid->is_nav('导航?')->value(function ($is_nav) {
@@ -108,15 +88,14 @@ class CategoryController extends BaseController
 
     protected function form()
     {
-        $this->rebuildTree();
-        $cates = $this->cate_drop_select();
+        $cates = $this->cate_drop_select(true);
         return Admin::form(Category::class, function (Form $form) use ($cates) {
             $form->display('cate_id', 'ID');
             $form->text('name', '分类名');
             $form->select('parent_id', '父分类')->options($cates);
-            $form->radio('state', '状态')->default(1)->options([0 => '关闭', 1 => '开启']);
-            $form->radio('is_show', '是否显示')->default(1)->options([0 => '不显示', 1 => '显示']);
-            $form->radio('is_nav', '是否是导航项')->default(1)->options([0 => '否', 1 => '是']);
+            $form->radio('state', '状态')->default(1)->options([1 => '开启',0 => '关闭']);
+            $form->radio('is_show', '是否显示')->default(1)->options([ 1 => '显示',0 => '不显示']);
+            $form->radio('is_nav', '是否是导航项')->default(1)->options([1 => '是',0 => '否' ]);
             $form->textarea('price_range', '价格区间')->help('每行代表一个价格区');
             $form->url('url', '路径')->value('https://');
             $form->textarea('description', '描述');
@@ -128,52 +107,52 @@ class CategoryController extends BaseController
         });
     }
 
-    //get 首页
-    public function index()
+    //初始化Node
+    protected function inite_data()
     {
-        /*$cates = [
+        $cates = [
             ['cate_id' => 1, 'name' => 'TV & Home Theather', "price_range" => "0-100,100-300,300-400",
                 "description" => "Repudiandae enim ut eaque et nihil.",
                 "keywords" => "delectus",
                 "is_show" => "1",
                 "is_nav" => "1",
                 "url" => "http://hayes.com/dicta-ex-quisquam-sunt-porro-sit-voluptas.html",
-                "order" => "9"],
+                "order" => "0"],
             ['cate_id' => 2, 'name' => 'Tablets & E-Readers', "price_range" => "0-100,100-300,300-400",
                 "description" => "Repudiandae enim ut eaque et nihil.",
                 "keywords" => "delectus",
                 "is_show" => "1",
                 "is_nav" => "1",
                 "url" => "http://hayes.com/dicta-ex-quisquam-sunt-porro-sit-voluptas.html",
-                "order" => "9"],
+                "order" => "1"],
             ['cate_id' => 3, 'name' => 'Computers', "price_range" => "0-100,100-300,300-400",
                 "description" => "Repudiandae enim ut eaque et nihil.",
                 "keywords" => "delectus",
                 "is_show" => "1",
                 "is_nav" => "1",
                 "url" => "http://hayes.com/dicta-ex-quisquam-sunt-porro-sit-voluptas.html",
-                "order" => "9", 'children' => [
+                "order" => "0", 'children' => [
                 ['cate_id' => 4, 'name' => 'Laptops', "price_range" => "0-100,100-300,300-400",
                     "description" => "Repudiandae enim ut eaque et nihil.",
                     "keywords" => "delectus",
                     "is_show" => "1",
                     "is_nav" => "1",
                     "url" => "http://hayes.com/dicta-ex-quisquam-sunt-porro-sit-voluptas.html",
-                    "order" => "9", 'children' => [
+                    "order" => "4", 'children' => [
                     ['cate_id' => 5, 'name' => 'PC Laptops', "price_range" => "0-100,100-300,300-400",
                         "description" => "Repudiandae enim ut eaque et nihil.",
                         "keywords" => "delectus",
                         "is_show" => "1",
                         "is_nav" => "1",
                         "url" => "http://hayes.com/dicta-ex-quisquam-sunt-porro-sit-voluptas.html",
-                        "order" => "9"],
+                        "order" => "1"],
                     ['cate_id' => 6, 'name' => 'Macbooks (Air/Pro)', "price_range" => "0-100,100-300,300-400",
                         "description" => "Repudiandae enim ut eaque et nihil.",
                         "keywords" => "delectus",
                         "is_show" => "1",
                         "is_nav" => "1",
                         "url" => "http://hayes.com/dicta-ex-quisquam-sunt-porro-sit-voluptas.html",
-                        "order" => "9"]
+                        "order" => "3"]
                 ]],
                 ['cate_id' => 7, 'name' => 'Desktops', "price_range" => "0-100,100-300,300-400",
                     "description" => "Repudiandae enim ut eaque et nihil.",
@@ -181,14 +160,14 @@ class CategoryController extends BaseController
                     "is_show" => "1",
                     "is_nav" => "1",
                     "url" => "http://hayes.com/dicta-ex-quisquam-sunt-porro-sit-voluptas.html",
-                    "order" => "9"],
+                    "order" => "6"],
                 ['cate_id' => 8, 'name' => 'Monitors', "price_range" => "0-100,100-300,300-400",
                     "description" => "Repudiandae enim ut eaque et nihil.",
                     "keywords" => "delectus",
                     "is_show" => "1",
                     "is_nav" => "1",
                     "url" => "http://hayes.com/dicta-ex-quisquam-sunt-porro-sit-voluptas.html",
-                    "order" => "9"]
+                    "order" => "1"]
             ]],
             ['cate_id' => 9, 'name' => 'Cell Phones', "price_range" => "0-100,100-300,300-400",
                 "description" => "Repudiandae enim ut eaque et nihil.",
@@ -196,20 +175,25 @@ class CategoryController extends BaseController
                 "is_show" => "1",
                 "is_nav" => "1",
                 "url" => "http://hayes.com/dicta-ex-quisquam-sunt-porro-sit-voluptas.html",
-                "order" => "9"]
+                "order" => "2"]
         ];
         Category::buildTree($cates);
-        */
+
         //dd(Category::isValidNestedSet());
         //dd($this->cate_drop_select(1));
+    }
 
-        return $this->_render($this->grid());
+    //get 首页
+    public function index()
+    {
+        //$this->inite_data();
+        return $this->_render($this->grid(),'分类列表');
     }
 
     //get 显示编辑
     public function edit($id)
     {
-        return $this->_render($this->form()->edit($id));
+        return $this->_render($this->form()->edit($id),'编辑分类');
     }
 
     public function create(Request $request)
@@ -225,6 +209,20 @@ class CategoryController extends BaseController
     //post 更新
     public function update(Request $request, $cate_id)
     {
+        if ($request->ajax()) {
+            //说明是更新 order
+            $cate_id = $request->get('pk');
+            $cate = Category::find($cate_id);
+            $cate->order = $request->get('value');
+            $rst = $cate->save();
+            if (!$rst) {
+                $message = trans('admin::lang.update_failed');
+            } else {
+                $message = trans('admin::lang.update_succeeded');
+            }
+            return response()->json(["status" => "true", "message" => $message]);
+        }
+
         $data = $request->except(['parent_id']);
         $parent_id = $request->get('parent_id');
         $current_node = Category::find($cate_id);
@@ -243,7 +241,6 @@ class CategoryController extends BaseController
 
             return redirect('admin/category')->with(compact('fail'));
         }
-//dd($change_parent);
 
         if ($change_parent) {
             if ($parent_id == 0) {

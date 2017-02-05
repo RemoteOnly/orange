@@ -28,6 +28,30 @@ use PhpParser\Node\Expr\AssignOp\Mod;
  * @property int $order 排序
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
+ * @property-read \Baum\Extensions\Eloquent\Collection|\App\Models\Category[] $cate_children
+ * @property-read \App\Models\Category $cate_parent
+ * @property-read \Baum\Extensions\Eloquent\Collection|\App\Models\Category[] $children
+ * @property-read \App\Models\Category $parent
+ * @method static \Illuminate\Database\Query\Builder|\Baum\Node limitDepth($limit)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Category whereCateId($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Category whereCreatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Category whereDepth($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Category whereDescription($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Category whereIsNav($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Category whereIsShow($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Category whereKeywords($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Category whereLft($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Category whereName($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Category whereOrder($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Category whereParentId($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Category wherePriceRange($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Category whereRgt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Category whereState($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Category whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Category whereUrl($value)
+ * @method static \Illuminate\Database\Query\Builder|\Baum\Node withoutNode($node)
+ * @method static \Illuminate\Database\Query\Builder|\Baum\Node withoutRoot()
+ * @method static \Illuminate\Database\Query\Builder|\Baum\Node withoutSelf()
  * @mixin \Eloquent
  */
 class Category extends Node

@@ -23,10 +23,7 @@ class BrandController extends BaseController
             $grid->description('描述')->limit(30);
             $grid->created_at('创建时间');
             $grid->updated_at('更新时间');
-            $grid->deleted_at('状态')->value(function ($deleted_at) {
-                return $deleted_at ? "<i class='fa fa-close' style='color:red'></i>" :
-                    "<i class='fa fa-check' style='color:green'></i>";
-            });
+            $grid->state('状态')->switch();
 
             $grid->getFilter()->disableIdFilter();
             $grid->filter(function ($filter) {
@@ -41,6 +38,7 @@ class BrandController extends BaseController
         return Admin::form(Brand::class, function (Form $form) {
             $form->display('brand_id', 'ID');
             $form->text('name', '品牌名');
+            $form->switch('state','状态')->default(1);
             $form->image('logo_path', 'logo')->uniqueName();
             $form->textarea('description', '描述');
             $form->number('order', '排序');
