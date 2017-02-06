@@ -17,5 +17,20 @@
  * Admin::js('/packages/prettydocs/js/main.js');
  *
  */
+use App\Admin\Extensions\Column\ExpandAttributeRow;
+use Encore\Admin\Grid\Column;
 
+Admin::js('/packages/clipboard/dist/clipboard.min.js');
+
+Column::extend('expand_attr', ExpandAttributeRow::class);
+/*Column::extend('openMap', OpenMap::class);
+Column::extend('floatBar', FloatBar::class);
+Column::extend('urlwrapper', UrlWrapper::class);
+
+Column::extend('prependIcon', function ($value, $icon) {
+
+    return "<span style='color: #999;'><i class='fa fa-$icon'></i>  $value</span>";
+
+});
 Encore\Admin\Form::forget(['map', 'editor']);
+*/

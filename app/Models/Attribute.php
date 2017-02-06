@@ -31,5 +31,9 @@ class Attribute extends Model
     protected $primaryKey = 'attr_id';
 
     //protected $fillable = ['state'];
-    
+
+    //hasmany
+    public function attribute_values(){
+        return $this->hasMany(AttributeValue::class,'attr_id','attr_id');
+    }
 }
