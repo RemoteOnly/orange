@@ -84,6 +84,10 @@ class AttributeController extends BaseController
                 $filter->disableIdFilter();
                 $filter->like('name', '属性名');
             });
+
+            $grid->actions(function ($actions) {
+                $actions->prepend('<a href=' . route('attribute_value.index', ['attr_id' => $actions->getKey()]) . '><i class="fa fa-eye"></i></a>');
+            });
         });
     }
 
@@ -106,22 +110,19 @@ class AttributeController extends BaseController
     }
 
 
-    public
-    function index()
+    public function index()
     {
         return $this->_render($this->grid(), '属性列表');
     }
 
 //get 编辑
-    public
-    function edit($attr_id)
+    public function edit($attr_id)
     {
         return $this->_render($this->form()->edit($attr_id), '编辑属性');
     }
 
 //get 新增
-    protected
-    function create()
+    protected function create()
     {
         return $this->_render($this->form(), '新增属性');
     }
