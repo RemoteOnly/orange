@@ -24,6 +24,8 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Brand whereOrder($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Brand whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property bool $state 状态
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Brand whereState($value)
  */
 class Brand extends Model
 {

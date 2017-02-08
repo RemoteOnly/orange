@@ -58,14 +58,21 @@ class AttributeValueController extends BaseController
             }
         });
 
+        $show_type = AttributeValue::find($attr_value_id)->attribute()->get()->first()->show_type;
 
-        dd($show_type);
         return Admin::form(AttributeValue::class, function (Form $form) use ($show_type) {
             $form->display('attr_value_id', 'ID');
             switch ($show_type){
-
+                case 1:
+                    $form->color('attr_value','属性值');
+                    break;
+                case 2:
+                    $form->image('attr_value','属性值')->disk('admin')->uniqueName();
+                    break;
+                default:
+                    $form->text('attr_value','属性值');
+                    break;
             }
-            $form->text('attr_value', '属性值');
             $form->number('order', '排序');
             $form->display('created_at');
             $form->display('updated_at');

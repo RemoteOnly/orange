@@ -24,6 +24,9 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Attribute whereShowType($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Attribute whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property bool $state 状态
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\AttributeValue[] $attribute_values
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Attribute whereState($value)
  */
 class Attribute extends Model
 {
